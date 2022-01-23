@@ -22,14 +22,12 @@ jobs:
     executor: terraform-executor
     steps:
       - checkout
-      - *show-current-branch-name
-      
+      - *show-current-branch-name      
       - run:
           name: Create .terraformrc file locally
           command: >-
             echo "credentials \"app.terraform.io\" {token =
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
-
       - run:
           name: Install dependencies
           command: |
@@ -38,19 +36,16 @@ jobs:
             sudo apt-get update && sudo apt-get install terraform            
             sudo apt-get update
             sudo apt install gettext-base moreutils -y
-
       - run:
           name: Fill out template variables in yaml files
           command: |
             export PR_NUMBER=$(echo "pr${CIRCLE_PULL_REQUEST##*/}")
             envsubst < kubernetes.tf | sponge kubernetes.tf
-
       - run:                  
           name: Terraform Validate & Format
           command: |
             terraform init
             terraform validate
-
       - run:                  
           name: Terraform Plan & Apply
           command: |            
@@ -68,38 +63,20 @@ jobs:
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
           name: Create .terraformrc file locally
       - run:
-          name: Install dependencies
-          command: |
-            sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-            sudo apt-get update && sudo apt-get install terraform            
-            sudo apt-get update
-            sudo apt install gettext-base moreutils -y
-      - run:
           name: Fill out template variables in yaml files
           command: |
             export RES_NAME=${PR_NUMBER}-${CIRCLE_PROJECT_REPONAME}
             export PR_NUMBER=$(echo "pr${CIRCLE_PULL_REQUEST##*/}")
             envsubst < kubernetes.tf | sponge kubernetes.tf
-
       - run:
           name: Terraform Destroy
           command: |
-            # date +%s
-            # currTime=$(date +%s)
-            # echo $currTime
-            # eAdd=$((60))
-            # echo $eAdd
-            # endTime=$((currTime+eAdd))
-            # echo $endTime
-            # while [ $currTime -le $endTime ]
-            # do
-            # currTime=$(date +%s)
-            # done
-            # echo datedcurrTime                        
-            echo "Continue to destroy-Hurray"
+            sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            sudo apt-get update && sudo apt-get install terraform            
+            sudo apt-get update            
+            sudo apt install gettext-base moreutils -y
             terraform init
-            # terraform destroy --auto-approve  -target kubernetes_namespace.example.id
             terraform destroy --auto-approve
 
 workflows:
