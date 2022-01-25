@@ -53,7 +53,7 @@ jobs:
             terraform apply --auto-approve
       - persist_to_workspace:
           root: ./
-           paths:
+          paths:
              - artifacts
 
   terraform-destroy:
