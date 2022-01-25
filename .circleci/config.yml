@@ -5,7 +5,7 @@ orbs:
 executors:
   terraform-executor:
     docker:
-      - image: cimg/base:stable
+      - image: hashicorp/terraform:0.14.3
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD    
@@ -15,64 +15,72 @@ aliases:
     run:
       name: Show current branch
       command: echo ${CIRCLE_BRANCH}
-
+  - &install-dependencies
+    run:
+      name: Install dependencies
+      command: |
+        mkdir -p artifacts
+        sudo apt-get -y -qq update
+        sudo apt-get install -y awscli
+        sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install terraform build-essential -y
+        sudo apt install gettext-base moreutils -y
       
 jobs:
   terraform-init-validate-plan-apply:
     executor: terraform-executor
     steps:
       - checkout
-      - *show-current-branch-name      
+      - *show-current-branch-name
+      - *install-dependencies
+      - run:
+          name: Copy Infrastructure Folder
+          command: |
+            cp -r infrastructure artifacts/infrastructure
       - run:
           name: Create .terraformrc file locally
           command: >-
             echo "credentials \"app.terraform.io\" {token =
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
       - run:
-          name: Install dependencies
-          command: |
-            sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-            sudo apt-get update && sudo apt-get install terraform            
-            sudo apt-get update
-            sudo apt install gettext-base moreutils -y
-      - run:
-          name: Fill out template variables in yaml files
-          command: |
-            export PR_NUMBER=$(echo "pr${CIRCLE_PULL_REQUEST##*/}")
-            envsubst < kubernetes.tf | sponge kubernetes.tf
-      - run:                  
           name: Terraform Validate & Format
           command: |
-            terraform init
+            cd infrastructure/
+            terraform init -backend=false
+            terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             terraform validate
+            # terraform fmt -check
       - run:                  
           name: Terraform Plan & Apply
           command: |            
             terraform plan
             terraform apply --auto-approve
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - artifacts
 
   terraform-destroy:
     executor: terraform-executor
     steps:
       - checkout
+      - attach_workspace:
+          at: ./      
       - *show-current-branch-name
+      - *install-dependencies      
       - run:
+          name: Create .terraformrc file locally
           command: >-
             echo "credentials \"app.terraform.io\" {token =
-            \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
-          name: Create .terraformrc file locally
+            \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc            
       - run:
           name: Terraform Destroy
           command: |
-            sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-            sudo apt-get update && sudo apt-get install terraform            
-            sudo apt-get update            
-            sudo apt install gettext-base moreutils -y
+            cd infrastructure/
             terraform init
+            terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             terraform destroy --auto-approve
-
 workflows:
   deploy_test_infra:
     jobs:      
