@@ -18,14 +18,13 @@ aliases:
   - &install-dependencies
     run:
       name: Install dependencies
-      command: |        
-        sudo -i
-        apt-get -y -qq update
-        apt-get install -y awscli
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-        apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        apt-get install terraform build-essential -y
-        apt install gettext-base moreutils -y
+      command: |
+        sudo apt-get -y -qq update
+        sudo apt-get install -y awscli
+        sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install terraform -y
+        sudo apt install gettext-base moreutils -y
       
 jobs:
   terraform-init-validate-plan-apply:
@@ -71,8 +70,7 @@ jobs:
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc            
       - run:
           name: Terraform Destroy
-          command: |
-            cd infrastructure/
+          command: |            
             terraform init
             terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             terraform destroy --auto-approve
