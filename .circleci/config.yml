@@ -5,7 +5,7 @@ orbs:
 executors:
   terraform-executor:
     docker:
-      - image: hashicorp/terraform:0.14.3
+      - image: cimg/base:stable
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD    
@@ -20,7 +20,7 @@ aliases:
       name: Install dependencies
       command: |
         mkdir -p artifacts
-        # sudo -i
+        sudo -i
         apt-get -y -qq update
         apt-get install -y awscli
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
