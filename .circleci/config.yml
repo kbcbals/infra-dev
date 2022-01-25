@@ -18,8 +18,7 @@ aliases:
   - &install-dependencies
     run:
       name: Install dependencies
-      command: |
-        # mkdir -p artifacts
+      command: |        
         sudo -i
         apt-get -y -qq update
         apt-get install -y awscli
@@ -35,10 +34,6 @@ jobs:
       - checkout
       - *show-current-branch-name
       - *install-dependencies
-      # - run:
-      #     name: Copy Infrastructure Folder
-      #     command: |
-      #       cp -r infrastructure artifacts/infrastructure
       - run:
           name: Create .terraformrc file locally
           command: >-
@@ -46,9 +41,8 @@ jobs:
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
       - run:
           name: Terraform Validate & Format
-          command: |
-            cd infrastructure/
-            terraform init -backend=false
+          command: |            
+            terraform init
             terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             terraform validate
             # terraform fmt -check
