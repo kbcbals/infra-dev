@@ -20,12 +20,13 @@ aliases:
       name: Install dependencies
       command: |
         mkdir -p artifacts
-        sudo apt-get -y -qq update
-        sudo apt-get install -y awscli
-        sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        sudo apt-get install terraform build-essential -y
-        sudo apt install gettext-base moreutils -y
+        sudo -i
+        apt-get -y -qq update
+        apt-get install -y awscli
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        apt-get install terraform build-essential -y
+        apt install gettext-base moreutils -y
       
 jobs:
   terraform-init-validate-plan-apply:
