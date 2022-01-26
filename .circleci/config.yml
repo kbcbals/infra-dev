@@ -19,6 +19,7 @@ aliases:
     run:
       name: Install dependencies
       command: |
+        mkdir -p artifacts
         sudo apt-get -y -qq update
         sudo apt-get install -y awscli
         sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -47,7 +48,7 @@ jobs:
             # terraform fmt -check
       - run:                  
           name: Terraform Plan & Apply
-          command: |            
+          command: |
             terraform plan
             terraform apply --auto-approve
       - persist_to_workspace:
