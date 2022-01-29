@@ -43,6 +43,7 @@ resource "aws_lambda_function" "lambda" {
   }
 }
 
+
  
 resource "aws_cloudwatch_event_rule" "every_five_minutes" {
     name = "every-five-minutes"
