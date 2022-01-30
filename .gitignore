@@ -131,4 +131,6 @@ dmypy.json
 
 # tf files
 .terraform/
-
+terraform.tfstate.backup
+terraform.tfstate
+.terraform.lock.hcl

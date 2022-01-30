@@ -74,8 +74,8 @@ jobs:
           name: Terraform Destroy
           command: |
             terraform init
-            terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
-            terraform destroy --auto-approve
+            # terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
+            terraform destroy --auto-approve            
 workflows:
   deploy_test_infra:
     jobs:      
