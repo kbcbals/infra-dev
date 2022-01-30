@@ -42,7 +42,7 @@ jobs:
       - run:
           name: Terraform Validate & Format
           command: |            
-            envsubst < ../eks-cluster.tf | sponge ../eks-cluster.tf
+            envsubst < eks-cluster.tf | sponge eks-cluster.tf
             terraform init            
             terraform validate
             # terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
@@ -72,7 +72,7 @@ jobs:
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc            
       - run:
           name: Terraform Destroy
-          command: |            
+          command: |
             terraform init
             terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             terraform destroy --auto-approve
