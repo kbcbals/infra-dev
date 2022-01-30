@@ -1,3 +1,15 @@
+terraform {
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "gz-infra"
+
+    workspaces {
+     name = "${CIRCLE_BRANCH}"
+    }
+  }
+}
+
+
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "17.24.0"

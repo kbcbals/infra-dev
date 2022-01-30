@@ -42,9 +42,10 @@ jobs:
       - run:
           name: Terraform Validate & Format
           command: |            
-            terraform init
-            terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
+            envsubst < ../eks-cluster.tf | sponge ../eks-cluster.tf
+            terraform init            
             terraform validate
+            # terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
             # terraform fmt -check
       - run:                  
           name: Terraform Plan & Apply
