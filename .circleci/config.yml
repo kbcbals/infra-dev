@@ -45,8 +45,6 @@ jobs:
             envsubst < eks-cluster.tf | sponge eks-cluster.tf
             terraform init            
             terraform validate
-            # terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
-            # terraform fmt -check
       - run:                  
           name: Terraform Plan & Apply
           command: |
@@ -73,8 +71,7 @@ jobs:
       - run:
           name: Terraform Destroy
           command: |
-            terraform init
-            # terraform workspace select ${CIRCLE_BRANCH} || terraform workspace new ${CIRCLE_BRANCH}
+            terraform init            
             terraform destroy --auto-approve            
 workflows:
   deploy_test_infra:

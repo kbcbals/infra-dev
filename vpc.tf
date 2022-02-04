@@ -38,3 +38,4 @@ module "vpc" {
     "local.cluster_name" = "test-django-backend"
   }  
 }
+
